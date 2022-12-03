@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "name": "database-interface",
+  "version": "1.0.0",
+  "description": "An API to connect and interact with a mysql database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack build --watch --progress",
+    "dev": "nodemon ./dist/dbinterface.bundle.js",
+    "start": "node ./dist/dbinterface.bundle.js"
+  },
+  "author": "cwnghng",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
