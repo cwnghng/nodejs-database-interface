@@ -6,7 +6,7 @@ api
 
   .get( '/', function ( req, res ) {
 
-    res.send( 'hey' );
+    res.status( 201 ).json( { hey: 'hey' } );
 
   } )
 

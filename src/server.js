@@ -6,15 +6,12 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 
-import API from './API';
+import App from './App';
 import Logger from './Logger';
 
-function App () {
+function Server () {
 
-  const app = express();
-  app.use( express.json() );
-
-  app.use( '/api', API );
+  const app = App().app;
 
   const options = {
 
@@ -43,4 +40,4 @@ function App () {
     
 }
 
-App().Start();
+Server().Start();

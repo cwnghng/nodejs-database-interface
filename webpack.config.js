@@ -5,7 +5,7 @@ module.exports = {
 
   entry: {
 
-    dbinterface: "./src/index.js",
+    dbinterface: "./src/server.js",
 
   },
 

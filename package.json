@@ -12,7 +12,7 @@
   "description": "An API to connect and interact with a mysql database",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watch",
     "build": "webpack build --watch --progress",
     "dev": "nodemon ./dist/dbinterface.bundle.js",
     "start": "node ./dist/dbinterface.bundle.js"
@@ -20,6 +20,15 @@
   "author": "cwnghng",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "@babel/preset-env": "^7.20.2",
+    "babel-jest": "^29.3.1",
+    "jest": "^29.3.1",
+    "nodemon": "^2.0.20",
+    "supertest": "^6.3.2"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.[t|j]sx?$": "babel-jest"
+    }
   }
 }
