@@ -9,9 +9,9 @@ import path from 'path';
 import App from './App';
 import Logger from './Logger';
 
-function Server () {
+async function Server () {
 
-  const app = App().app;
+  const app = ( await App() ).app;
 
   const options = {
 
@@ -40,4 +40,5 @@ function Server () {
     
 }
 
-Server().Start();
+Server()
+.then( server => server.Start() );
