@@ -1,13 +1,13 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import DbInterface from "./DbInterface";
+import DbInterface from "../src/DbInterface.js";
 
 const 
   HOST = process.env.SQL_HOST,
   USERNAME = process.env.SQL_USERNAME,
   PASSWORD = process.env.SQL_PASSWORD,
-  DATABASE = 'database_test';
+  DATABASE = process.env.SQL_DATABASE;
 
 let DB
 
