@@ -56,6 +56,9 @@ async function DbInterface ( host, username, password, database, params = {} ) {
 
     try {
 
+      const user = await read( table, { addr: options.addr } );
+      if ( user !== undefined ) throw new Error( 'Validation error' );
+
       const entry = tables[ table ].build( options );
 
       const response = await entry.save();
@@ -64,7 +67,7 @@ async function DbInterface ( host, username, password, database, params = {} ) {
 
     } catch ( error ) {
 
-      throw error;
+      Logger.error( error );
 
     }
 
