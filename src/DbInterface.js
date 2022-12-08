@@ -1,4 +1,3 @@
-import mysql from 'mysql2';
 import { Sequelize } from 'sequelize';
 // import Commands from './DbInterface.Commands.js';
 import Logger from './Logger';
@@ -15,7 +14,8 @@ async function DbInterface ( host, username, password, database, params = {} ) {
       // message => Logger.info( message ) 
       : 
       message => Logger.info( message ) 
-    )
+    ),
+    dialectModule: require('mysql2')
 
   } );
 
@@ -137,6 +137,12 @@ async function DbInterface ( host, username, password, database, params = {} ) {
     try {
 
       const entry = await read( table, readOptions ); 
+
+      for ( const [ key, value ] of Object.entries( updateOptions ) ) {
+
+        !value && delete updateOptions[ key ];
+
+      }
 
       entry.set( updateOptions );
 
