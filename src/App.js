@@ -5,6 +5,8 @@ import Logger from './Logger';
 
 function App () {
 
+  Logger.info( 'Starting Express application' )
+
   const app = express();
 
   app.use( express.json() );
