@@ -1,103 +1,199 @@
 import mysql from 'mysql2';
 import { Sequelize } from 'sequelize';
-import Commands from './DbInterface.Commands.js';
+// import Commands from './DbInterface.Commands.js';
 import Logger from './Logger';
+import * as Models from './DbInterface.Models';
 
 async function DbInterface ( host, username, password, database, params = {} ) {
 
-  const db = new Sequelize( database, username, password, {
+  const isTest = ( database.substr( database.length - 5 ) === '_test' );
+  const DB = new Sequelize( database, username, password, {
 
-    host, dialect: 'mysql', logging: message => Logger.info( message )
+    host, dialect: 'mysql', 
+    logging: ( isTest ? 
+      () => null 
+      // message => Logger.info( message ) 
+      : 
+      message => Logger.info( message ) 
+    )
 
   } );
 
+  let status;
+  const tables = {}
+
+  // Connecting to the database;
   try {
 
-    await db.authenticate();
-    console.log('Connection has been established successfully.');
+    await DB.authenticate();
+    status = 'connected';
+    Logger.info( 'Database connection has been established successfully.' );
 
   } catch (error) {
 
-    console.error('Unable to connect to the database:', error);
+    status = 'disconnected';
+    Logger.error( error );
+    throw Error( error );
 
   }
 
-  const commands = setupCommands();
+  await defineModel( 'users', Models.UserModel );
 
   return {
 
-
-
-  }
-
-  function initDB() {
-
-
-    
-  }
-
-  async function isDbExist() {
-
-    const connection = mysql.createConnection( {
-
-      host, username, password
-
-    } );
-
-    connection.connect();
-
-    const sql = `SELECT schema_name FROM information_schema.schemata WHERE schema_name = '${ SQL_DATABASE }`;
-
-    return new Promise( ( resolve, reject ) => {
-
-      connection.query( sql, ( error, result ) => {
-
-        connection.end();
-
-        if ( error ) {
-
-          Logger.error( error );
-
-          reject( error );
-
-        } else if ( result.length === 0 ) {
-
-          Logger.debug( `Database ${ database } does not exist` );
-
-          resolve( false );
-
-        } else {
-
-          Logger.debug( `Database ${ database } exists` );
-
-          resolve( true );
-
-        }
-
-      } )
-
-    } )
+    status,
+    isTest,
+    create,
+    createBatch,
+    read,
+    readAll,
+    update,
+    remove
 
   }
 
-  async function runCommand ( cmd, params ) {
+  async function create ( table, options ) {
 
     try {
 
-      const response = await cmd( DB, params );
+      const entry = tables[ table ].build( options );
 
-      Logger.info( response.message );
+      const response = await entry.save();
 
-      return response.result;
+      return response;
+
+    } catch ( error ) {
+
+      throw error;
 
     }
 
-    catch ( error ) {
+  }
 
-      Logger.error( error );
+  async function createBatch ( table, batchOptions ) {
+
+    const saves = [];
+
+    try {
+
+      batchOptions.forEach( async ( options, index ) => {
+
+        saves[ index ] = create( table, options );
+
+      } )
+
+      await Promise.all( saves );
+      
+      return;
+
+    } catch ( error ) {
+
+      throw error;
+
+    }
+
+  }
+
+  async function read ( table, options ) {
+
+    try {
+
+      const entries = await tables[ table ].findAll( {
+
+        where: options,
+
+      } )
+
+      const entry = entries[ 0 ];
+
+      return entry;
+
+    } catch ( error ) {
+
+      throw error;
+
+    }
+
+  }
+
+  async function readAll ( table ) {
+
+    try {
+
+      const entries = await tables[ table ].findAll();
+
+      return entries;
+
+    } catch ( error ) {
+
+      throw error;
 
     }
     
+  }
+
+  async function update ( table, readOptions, updateOptions ) {
+
+    try {
+
+      const entry = await read( table, readOptions ); 
+
+      entry.set( updateOptions );
+
+      const response = await entry.save();
+
+      return response;
+
+    } catch ( error ) {
+
+      throw error;
+
+    }
+
+  }
+
+  async function remove ( table, readOptions ) {
+
+    try {
+
+      await tables[ table ].destroy( {
+
+        where: readOptions
+
+      } )
+
+      return;
+
+    } catch ( error ) {
+
+      throw error;
+
+    }
+
+  }
+
+  async function defineModel ( modelName, modelOptions ) {
+
+    try {
+
+      const model = DB.define( modelName, modelOptions, {
+        freezeTableName: true
+      } )
+
+      isTest && model.sync( { force: true } );
+
+      tables[ modelName ] = model;
+
+      await model.sync();
+
+      return;
+
+    } catch ( error ) {
+
+      throw error;
+
+    }
+
   }
 
 }
